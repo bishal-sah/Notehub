@@ -85,3 +85,55 @@ class Subject(models.Model):
     @property
     def total_notes(self):
         return self.notes.filter(status='approved').count()
+
+
+class SubjectProgress(models.Model):
+    """
+    Tracks a user's study progress for a specific subject.
+    Used by the Semester Roadmap Planner.
+    """
+
+    class Status(models.TextChoices):
+        NOT_STARTED = 'not_started', 'Not Started'
+        IN_PROGRESS = 'in_progress', 'In Progress'
+        COMPLETED = 'completed', 'Completed'
+
+    user = models.ForeignKey(
+        'users.User',
+        on_delete=models.CASCADE,
+        related_name='subject_progress',
+    )
+    subject = models.ForeignKey(
+        Subject,
+        on_delete=models.CASCADE,
+        related_name='user_progress',
+    )
+    percent_complete = models.PositiveIntegerField(
+        default=0,
+        help_text='0-100 syllabus completion percentage',
+    )
+    status = models.CharField(
+        max_length=15,
+        choices=Status.choices,
+        default=Status.NOT_STARTED,
+    )
+    notes_studied = models.PositiveIntegerField(default=0)
+    target_date = models.DateField(
+        null=True,
+        blank=True,
+        help_text='Target completion date set by user',
+    )
+    notes_text = models.TextField(
+        blank=True,
+        max_length=500,
+        help_text='Personal notes/reminders for this subject',
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'subject')
+        ordering = ['subject__name']
+
+    def __str__(self):
+        return f"{self.user.username} — {self.subject.name}: {self.percent_complete}%"

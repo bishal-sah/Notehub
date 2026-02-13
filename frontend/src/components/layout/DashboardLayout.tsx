@@ -12,8 +12,9 @@ import { cn } from '@/lib/utils';
 import {
   BookOpen, LayoutDashboard, Upload, FileText, User, Bell, Lock,
   Shield, CheckSquare, Users, GraduationCap, Copy, FileWarning, Settings,
-  Menu, X, LogOut, ChevronLeft,
+  Menu, X, LogOut, ChevronLeft, Trophy, Bookmark, MessageSquare, Brain, ScanLine, UserPlus, Map, Award,
 } from 'lucide-react';
+import ThemeToggle from '@/components/layout/ThemeToggle';
 
 interface SidebarLink {
   label: string;
@@ -34,6 +35,14 @@ export default function DashboardLayout() {
     { label: 'Profile', href: '/dashboard/profile', icon: <User className="h-4 w-4" /> },
     { label: 'Change Password', href: '/dashboard/change-password', icon: <Lock className="h-4 w-4" /> },
     { label: 'Notifications', href: '/dashboard/notifications', icon: <Bell className="h-4 w-4" /> },
+    { label: 'My Library', href: '/dashboard/collections', icon: <Bookmark className="h-4 w-4" /> },
+    { label: 'Study Groups', href: '/dashboard/groups', icon: <MessageSquare className="h-4 w-4" /> },
+    { label: 'Study Buddies', href: '/dashboard/study-buddies', icon: <UserPlus className="h-4 w-4" /> },
+    { label: 'Semester Roadmap', href: '/dashboard/roadmap', icon: <Map className="h-4 w-4" /> },
+    { label: 'Flashcards', href: '/dashboard/flashcards', icon: <Brain className="h-4 w-4" /> },
+    { label: 'OCR Scanner', href: '/dashboard/ocr', icon: <ScanLine className="h-4 w-4" /> },
+    { label: 'Leaderboard', href: '/leaderboard', icon: <Trophy className="h-4 w-4" /> },
+    { label: 'Reputation', href: '/dashboard/reputation', icon: <Award className="h-4 w-4" /> },
   ];
 
   const adminLinks: SidebarLink[] = [
@@ -118,11 +127,12 @@ export default function DashboardLayout() {
         )}
       </ScrollArea>
 
-      {/* Logout */}
-      <div className="border-t p-3">
-        <Button variant="ghost" className="w-full justify-start gap-3" onClick={handleLogout}>
+      {/* Theme + Logout */}
+      <div className="border-t p-3 flex items-center gap-2">
+        <Button variant="ghost" className="flex-1 justify-start gap-3" onClick={handleLogout}>
           <LogOut className="h-4 w-4" /> Log out
         </Button>
+        <ThemeToggle />
       </div>
     </div>
   );

@@ -20,6 +20,9 @@ urlpatterns = [
     path('api/academics/', include('apps.academics.urls')),
     path('api/notes/', include('apps.notes.urls')),
     path('api/dashboard/', include('apps.dashboard.urls')),
+    path('api/gamification/', include('apps.gamification.urls')),
+    path('api/groups/', include('apps.groups.urls')),
+    path('api/resources/', include('apps.resources.urls')),
 
     # API Documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

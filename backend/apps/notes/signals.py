@@ -1,6 +1,7 @@
 """
 Signals for the notes app.
 Sends notifications when notes are approved/rejected.
+Also dispatches async email notifications via Celery.
 """
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -33,3 +34,11 @@ def notify_user_on_approval(sender, instance, created, **kwargs):
                 notification_type=Notification.NotificationType.NOTE_REJECTED,
                 link=f'/dashboard/my-notes',
             )
+
+        # Dispatch async email notification via Celery
+        from apps.notes.tasks import send_note_approval_email
+        send_note_approval_email.delay(
+            note_id=note.id,
+            action=instance.action,
+            reason=instance.reason or '',
+        )

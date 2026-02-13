@@ -11,6 +11,7 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { BookOpen, Menu, X, LogOut, User, LayoutDashboard, Shield } from 'lucide-react';
+import ThemeToggle from '@/components/layout/ThemeToggle';
 
 export default function Navbar() {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
@@ -26,6 +27,8 @@ export default function Navbar() {
     { label: 'Home', href: '/' },
     { label: 'Faculties', href: '/faculties' },
     { label: 'Browse Notes', href: '/notes' },
+    { label: 'Resources', href: '/resources' },
+    { label: 'Leaderboard', href: '/leaderboard' },
     { label: 'About', href: '/about' },
   ];
 
@@ -49,6 +52,7 @@ export default function Navbar() {
 
         {/* Auth Section */}
         <div className="hidden md:flex items-center gap-3">
+          <ThemeToggle />
           {isAuthenticated && user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -91,9 +95,12 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Menu Toggle */}
-        <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </Button>
+        <div className="flex items-center gap-1 md:hidden">
+          <ThemeToggle />
+          <Button variant="ghost" size="icon" onClick={() => setMobileOpen(!mobileOpen)}>
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
       </div>
 
       {/* Mobile Menu */}

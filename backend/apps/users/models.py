@@ -81,3 +81,81 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"{self.title} → {self.user.username}"
+
+
+class PasswordResetToken(models.Model):
+    """Token for password reset via email."""
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='password_reset_tokens',
+    )
+    token = models.CharField(max_length=64, unique=True, db_index=True)
+    is_used = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Reset token for {self.user.email}"
+
+    @property
+    def is_expired(self):
+        from django.utils import timezone
+        return timezone.now() > self.expires_at
+
+    @property
+    def is_valid(self):
+        return not self.is_used and not self.is_expired
+
+
+class StudyBuddyRequest(models.Model):
+    """
+    Study buddy connection request between two users.
+    Matching is based on shared faculty, semester, or subjects.
+    """
+
+    class Status(models.TextChoices):
+        PENDING = 'pending', 'Pending'
+        ACCEPTED = 'accepted', 'Accepted'
+        REJECTED = 'rejected', 'Rejected'
+
+    sender = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='buddy_requests_sent',
+    )
+    receiver = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='buddy_requests_received',
+    )
+    status = models.CharField(
+        max_length=10,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
+    message = models.TextField(
+        blank=True,
+        max_length=300,
+        help_text='Short intro message from the sender',
+    )
+    subject = models.ForeignKey(
+        'academics.Subject',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='buddy_requests',
+        help_text='The subject they want to study together',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = ('sender', 'receiver')
+
+    def __str__(self):
+        return f"{self.sender.username} → {self.receiver.username} ({self.status})"

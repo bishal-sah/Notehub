@@ -1,0 +1,15 @@
+{% extends "emails/base.html" %}
+{% block title %}Note Approved - NoteHub{% endblock %}
+{% block content %}
+<h2>Your note has been approved! 🎉</h2>
+<p>Hi <strong>{{ user_name }}</strong>,</p>
+<p>Great news — your note has been reviewed and <span class="badge badge-green">Approved</span> by our team.</p>
+<hr class="divider">
+<div class="note-card">
+  <h4>{{ note_title }}</h4>
+  <p>{{ note_subject }} · Uploaded {{ note_date }}</p>
+</div>
+<p>Your note is now publicly visible and can be downloaded by other students.</p>
+<a href="{{ note_url }}" class="btn">View Your Note</a>
+<p class="muted">Keep sharing great notes — you're helping the community!</p>
+{% endblock %}

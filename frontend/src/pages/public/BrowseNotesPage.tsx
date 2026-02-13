@@ -12,7 +12,9 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { Search, FileText, Download, Eye, Loader2, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react';
+import SemesterPacks from '@/components/notes/SemesterPacks';
+import { Separator } from '@/components/ui/separator';
+import { Search, FileText, Download, Eye, Loader2, BookOpen, ChevronLeft, ChevronRight, Star, ShieldCheck } from 'lucide-react';
 
 export default function BrowseNotesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -87,6 +89,15 @@ export default function BrowseNotesPage() {
           </div>
         </section>
 
+        {/* Semester Packs */}
+        <section className="py-8 bg-muted/30">
+          <div className="container">
+            <SemesterPacks />
+          </div>
+        </section>
+
+        <Separator />
+
         <section className="py-8">
           <div className="container">
             {/* Filters */}
@@ -116,6 +127,7 @@ export default function BrowseNotesPage() {
                   <SelectItem value="created_at">Oldest First</SelectItem>
                   <SelectItem value="-downloads_count">Most Downloaded</SelectItem>
                   <SelectItem value="-views_count">Most Viewed</SelectItem>
+                  <SelectItem value="-average_rating">Top Rated</SelectItem>
                   <SelectItem value="title">Title A-Z</SelectItem>
                 </SelectContent>
               </Select>
@@ -151,13 +163,25 @@ export default function BrowseNotesPage() {
                           <div className="flex flex-wrap gap-1">
                             {note.subject_name && <Badge variant="outline" className="text-xs">{note.subject_name}</Badge>}
                             {note.file_type && <Badge variant="secondary" className="text-xs uppercase">{note.file_type}</Badge>}
+                            {note.topper_verified && (
+                              <Badge className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-[10px] gap-0.5 px-1.5 py-0 border-0 shadow-sm">
+                                <ShieldCheck className="h-3 w-3" />
+                                Topper Verified
+                              </Badge>
+                            )}
                           </div>
                         </CardContent>
                         <CardFooter className="pt-2 border-t text-xs text-muted-foreground">
                           <div className="flex items-center gap-3 w-full">
                             <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{note.views_count}</span>
                             <span className="flex items-center gap-1"><Download className="h-3 w-3" />{note.downloads_count}</span>
-                            <span className="ml-auto">{note.uploaded_by_name}</span>
+                            {note.average_rating && (
+                              <span className="flex items-center gap-0.5">
+                                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                                {note.average_rating.toFixed(1)}
+                              </span>
+                            )}
+                            <span className="ml-auto">{note.author_name}</span>
                           </div>
                         </CardFooter>
                       </Card>

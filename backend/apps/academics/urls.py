@@ -15,6 +15,8 @@ from apps.academics.views import (
     AdminSemesterDetailView,
     AdminSubjectListCreateView,
     AdminSubjectDetailView,
+    SemesterRoadmapView,
+    SubjectProgressUpdateView,
 )
 
 urlpatterns = [
@@ -33,4 +35,8 @@ urlpatterns = [
     path('admin/semesters/<int:pk>/', AdminSemesterDetailView.as_view(), name='admin-semester-detail'),
     path('admin/subjects/', AdminSubjectListCreateView.as_view(), name='admin-subject-list'),
     path('admin/subjects/<int:pk>/', AdminSubjectDetailView.as_view(), name='admin-subject-detail'),
+
+    # Semester Roadmap Planner
+    path('roadmap/', SemesterRoadmapView.as_view(), name='semester-roadmap'),
+    path('roadmap/progress/', SubjectProgressUpdateView.as_view(), name='subject-progress-update'),
 ]

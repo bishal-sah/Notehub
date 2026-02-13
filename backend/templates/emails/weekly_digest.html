@@ -1,0 +1,24 @@
+{% extends "emails/base.html" %}
+{% block title %}Weekly Digest - NoteHub{% endblock %}
+{% block content %}
+<h2>Your Weekly Notes Digest 📚</h2>
+<p>Hi <strong>{{ user_name }}</strong>,</p>
+<p>Here's what's new in <span class="badge badge-blue">{{ faculty_name }}</span> this week:</p>
+<hr class="divider">
+
+{% if notes %}
+<p><strong>{{ notes|length }} new note{{ notes|length|pluralize }}</strong> uploaded this week:</p>
+{% for note in notes %}
+<div class="note-card">
+  <h4>{{ note.title }}</h4>
+  <p>{{ note.subject }} · by {{ note.author }} · {{ note.file_type|upper }}</p>
+</div>
+{% endfor %}
+<a href="{{ browse_url }}" class="btn">Browse All Notes</a>
+{% else %}
+<p>No new notes were uploaded in your faculty this week. Check back next Monday!</p>
+{% endif %}
+
+<hr class="divider">
+<p class="muted">You're receiving this digest because you belong to the {{ faculty_name }} faculty. New digests are sent every Monday.</p>
+{% endblock %}

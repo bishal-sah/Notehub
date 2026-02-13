@@ -1,28 +1,46 @@
 /**
- * User dashboard overview with stats and recent uploads.
+ * User dashboard overview with stats, gamification, charts, and recent uploads.
  */
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { dashboardService } from '@/lib/services';
+import { dashboardService, gamificationService } from '@/lib/services';
 import { useAuth } from '@/context/AuthContext';
-import type { NoteListItem, UserDashboardStats } from '@/types';
+import type { NoteListItem, UserDashboardResponse, MyGamification, Badge as BadgeType } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Upload, Eye, Download, Loader2, ArrowRight } from 'lucide-react';
+import BadgeCard from '@/components/gamification/BadgeCard';
+import { FileText, Upload, Eye, Download, Loader2, ArrowRight, Star, Trophy, Award } from 'lucide-react';
+import { UploadTrendChart, StatusDonutChart, VerticalBarChart } from '@/components/charts/AnalyticsCharts';
+import LearningTracker from '@/components/learning/LearningTracker';
 
 export default function UserDashboard() {
   const { user } = useAuth();
-  const [stats, setStats] = useState<UserDashboardStats | null>(null);
+  const [data, setData] = useState<UserDashboardResponse | null>(null);
   const [recentNotes, setRecentNotes] = useState<NoteListItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [gamification, setGamification] = useState<MyGamification | null>(null);
+  const [allBadges, setAllBadges] = useState<BadgeType[]>([]);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await dashboardService.user();
-        setStats(res.data.stats);
-        setRecentNotes(res.data.recent_uploads || []);
+        const [dashRes, gamRes, badgesRes] = await Promise.allSettled([
+          dashboardService.user(),
+          gamificationService.me(),
+          gamificationService.badges(),
+        ]);
+        if (dashRes.status === 'fulfilled') {
+          setData(dashRes.value.data);
+          setRecentNotes(dashRes.value.data.recent_uploads || []);
+        }
+        if (gamRes.status === 'fulfilled') {
+          setGamification(gamRes.value.data);
+        }
+        if (badgesRes.status === 'fulfilled') {
+          const bd = badgesRes.value.data;
+          setAllBadges(Array.isArray(bd) ? bd : (bd as any)?.results ?? []);
+        }
       } catch {
         // silent
       } finally {
@@ -39,6 +57,9 @@ export default function UserDashboard() {
       </div>
     );
   }
+
+  const stats = data?.stats;
+  const charts = data?.charts;
 
   const statCards = [
     { label: 'Total Notes', value: stats?.total_notes || 0, icon: <FileText className="h-5 w-5" />, color: 'text-blue-600' },
@@ -71,6 +92,102 @@ export default function UserDashboard() {
         ))}
       </div>
 
+      {/* Analytics Charts */}
+      {charts && (
+        <div className="grid md:grid-cols-2 gap-4">
+          {charts.upload_trends?.length > 0 && (
+            <UploadTrendChart data={charts.upload_trends} title="Your Upload Activity (Last 90 Days)" />
+          )}
+          {charts.status_distribution && (
+            <StatusDonutChart data={charts.status_distribution} title="Notes by Status" />
+          )}
+          {charts.top_subjects?.length > 0 && (
+            <VerticalBarChart
+              data={charts.top_subjects}
+              dataKey="count"
+              title="Your Top Subjects"
+              color="#8b5cf6"
+              nameKey="name"
+            />
+          )}
+          {charts.views_downloads?.length > 0 && (
+            <VerticalBarChart
+              data={charts.views_downloads.map(d => ({
+                name: new Date(d.date).toLocaleDateString('en-US', { month: 'short' }),
+                views: d.views,
+                downloads: d.downloads,
+              }))}
+              dataKey="views"
+              title="Monthly Views"
+              color="#6366f1"
+              nameKey="name"
+            />
+          )}
+        </div>
+      )}
+
+      {/* Gamification Summary */}
+      {gamification && (
+        <div className="grid sm:grid-cols-3 gap-4">
+          <Card className="border-yellow-200 bg-yellow-50/30">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Points</p>
+                  <p className="text-2xl font-bold">{gamification.total_points}</p>
+                </div>
+                <Star className="h-5 w-5 text-yellow-500" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Global Rank</p>
+                  <p className="text-2xl font-bold">#{gamification.rank}</p>
+                </div>
+                <Trophy className="h-5 w-5 text-amber-500" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Badges Earned</p>
+                  <p className="text-2xl font-bold">{gamification.badges.length}</p>
+                </div>
+                <Award className="h-5 w-5 text-purple-500" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Badges */}
+      {allBadges.length > 0 && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-base">Your Badges</CardTitle>
+            <Link to="/leaderboard">
+              <Button variant="ghost" size="sm" className="gap-1">Leaderboard <ArrowRight className="h-3 w-3" /></Button>
+            </Link>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+              {allBadges.map((badge) => {
+                const earned = gamification?.badges.find(ub => ub.badge.id === badge.id) || null;
+                return <BadgeCard key={badge.id} badge={badge} earned={earned} size="sm" />;
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Learning Tracker */}
+      <LearningTracker />
+
       {/* Quick Actions */}
       <div className="flex flex-wrap gap-3">
         <Link to="/dashboard/upload">
@@ -78,6 +195,9 @@ export default function UserDashboard() {
         </Link>
         <Link to="/dashboard/my-notes">
           <Button variant="outline" className="gap-2"><FileText className="h-4 w-4" /> My Notes</Button>
+        </Link>
+        <Link to="/leaderboard">
+          <Button variant="outline" className="gap-2"><Trophy className="h-4 w-4" /> Leaderboard</Button>
         </Link>
       </div>
 

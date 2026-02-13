@@ -30,7 +30,7 @@ export default function LoginPage() {
     } catch (err: any) {
       toast({
         title: 'Login failed',
-        description: err?.response?.data?.detail || 'Invalid email or password.',
+        description: err?.response?.data?.error || err?.response?.data?.detail || 'Invalid email or password.',
         variant: 'destructive',
       });
     } finally {

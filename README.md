@@ -41,7 +41,9 @@ NoteHub/
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── layout/     # Navbar, Footer, DashboardLayout, ProtectedRoute
-│   │   │   └── ui/         # ShadCN components (button, card, badge, etc.)
+│   │   │   ├── ui/         # ShadCN components (button, card, badge, etc.)
+│   │   │   ├── viewer/     # PdfViewer, DocViewer, NoteViewer (in-browser reader)
+│   │   │   └── collaboration/ # CommentThread, AnnotationLayer (discussions)
 │   │   ├── context/        # AuthContext (JWT auth state)
 │   │   ├── lib/            # api.ts, services.ts, utils.ts
 │   │   ├── pages/
@@ -68,6 +70,7 @@ NoteHub/
 - **Landing Page** — Hero, features overview, stats, CTA
 - **Browse Notes** — Filter by faculty, subject; sort by date, views, downloads; paginated
 - **Note Detail** — Full metadata, download button, report functionality
+- **In-Browser Document Viewer** — Read PDFs directly in the browser with page navigation, zoom, rotation, fullscreen, and keyboard shortcuts. Office files (doc/ppt) rendered via Microsoft Office Online embed
 - **Faculties** — Browse all faculties with semester/subject info
 - **About** — Platform mission, values, and feature details
 - **Auth** — Login, Register, Forgot Password
@@ -90,6 +93,26 @@ NoteHub/
 - **Duplicate Detection** — AI-powered similarity scanning with configurable threshold
 - **Reports** — View and resolve reported notes
 - **Settings** — Platform configuration (registration, approval, file limits)
+
+### In-Browser Document Viewer
+- **PDF Viewer** — Powered by `react-pdf` (pdf.js), renders PDFs directly in the browser
+- **Continuous Scroll** — All pages rendered in a scrollable view with auto page tracking
+- **Zoom Controls** — Zoom in/out, preset zoom levels (50%–200%)
+- **Rotation** — Rotate documents 90° at a time
+- **Fullscreen Mode** — Expand viewer to fill the entire screen
+- **Keyboard Shortcuts** — +/- (zoom), R (rotate), F (fullscreen)
+- **Office File Preview** — Doc/Docx/PPT/PPTX files rendered via Microsoft Office Online embed
+- **Graceful Fallback** — Error states with download-instead option for unsupported formats
+
+### Collaborative Annotations & Comments
+- **Threaded Comments** — Google Docs-style discussion below each note with nested replies
+- **Highlight Annotations** — Click-and-drag to highlight regions on PDF pages with color-coded markers
+- **Annotation Popovers** — Click any highlight to view the annotation, author, and timestamp
+- **Color Picker** — Choose from 5 highlight colors (yellow, green, blue, pink, purple)
+- **Resolve / Reopen** — Mark annotations as resolved to dim them, reopen if needed
+- **Edit & Delete** — Authors can edit or soft-delete their own comments and annotations
+- **Ctrl+Enter** — Quick-post comments with keyboard shortcut
+- **Auth-Gated** — Only logged-in users can post; guests can read
 
 ### AI Features
 - **Duplicate Detection** — TF-IDF cosine similarity to find duplicate uploads
@@ -175,9 +198,22 @@ The Vite dev server proxies `/api` requests to the Django backend.
 | GET | `/api/notes/` | Browse approved notes |
 | GET | `/api/notes/:slug/` | Note detail |
 | POST | `/api/notes/:slug/download/` | Download note |
+| GET | `/api/notes/:slug/preview/` | Preview file (inline, no download count) |
 | GET | `/api/notes/search/` | Semantic search |
 | POST | `/api/notes/user/upload/` | Upload note |
 | GET | `/api/notes/user/my-notes/` | User's notes |
+
+### Comments & Annotations
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/notes/:slug/comments/` | List threaded comments |
+| POST | `/api/notes/comments/create/` | Create comment or reply |
+| PATCH | `/api/notes/comments/:id/` | Edit own comment |
+| DELETE | `/api/notes/comments/:id/` | Soft-delete own comment |
+| GET | `/api/notes/:slug/annotations/` | List annotations for a note |
+| POST | `/api/notes/annotations/create/` | Create highlight annotation |
+| PATCH | `/api/notes/annotations/:id/` | Update annotation (body/color/resolve) |
+| DELETE | `/api/notes/annotations/:id/` | Delete own annotation |
 
 ### Admin
 | Method | Endpoint | Description |
@@ -207,8 +243,8 @@ CORS_ALLOWED_ORIGINS=http://localhost:5173
 
 | Role | Capabilities |
 |------|-------------|
-| **Guest** | Browse notes, view details |
-| **User** | Upload, download, manage own notes, report |
+| **Guest** | Browse notes, view details, read comments & annotations |
+| **User** | Upload, download, manage own notes, report, comment, annotate |
 | **Admin** | Approve/reject notes, manage users/faculties, view analytics |
 
 ---

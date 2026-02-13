@@ -17,6 +17,12 @@ from apps.users.views import (
     AdminUserDetailView,
     AdminUserToggleActiveView,
     AdminUserVerifyView,
+    PasswordResetRequestView,
+    PasswordResetConfirmView,
+    StudyBuddyMatchView,
+    StudyBuddyRequestView,
+    StudyBuddyRespondView,
+    StudyBuddyListView,
 )
 
 urlpatterns = [
@@ -41,4 +47,14 @@ urlpatterns = [
     path('admin/users/<int:pk>/', AdminUserDetailView.as_view(), name='admin-user-detail'),
     path('admin/users/<int:pk>/toggle-active/', AdminUserToggleActiveView.as_view(), name='admin-user-toggle-active'),
     path('admin/users/<int:pk>/verify/', AdminUserVerifyView.as_view(), name='admin-user-verify'),
+
+    # Password Reset
+    path('password-reset/', PasswordResetRequestView.as_view(), name='password-reset-request'),
+    path('password-reset/confirm/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
+
+    # Study Buddy Matching
+    path('study-buddies/', StudyBuddyListView.as_view(), name='study-buddy-list'),
+    path('study-buddies/matches/', StudyBuddyMatchView.as_view(), name='study-buddy-matches'),
+    path('study-buddies/request/', StudyBuddyRequestView.as_view(), name='study-buddy-request'),
+    path('study-buddies/respond/<int:pk>/', StudyBuddyRespondView.as_view(), name='study-buddy-respond'),
 ]

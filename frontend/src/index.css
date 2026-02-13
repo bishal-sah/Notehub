@@ -57,3 +57,226 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ─── 3D Gradient Blob Animations ─────────────────────── */
+
+@keyframes blob {
+  0%, 100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+    transform: translate(20px, -30px) scale(1.05);
+  }
+  50% {
+    border-radius: 50% 60% 30% 60% / 30% 50% 70% 50%;
+    transform: translate(-20px, 20px) scale(0.95);
+  }
+  75% {
+    border-radius: 60% 30% 50% 40% / 70% 40% 50% 60%;
+    transform: translate(15px, 10px) scale(1.02);
+  }
+}
+
+@keyframes blob-spin {
+  0% { transform: rotate(0deg) scale(1); }
+  33% { transform: rotate(120deg) scale(1.1); }
+  66% { transform: rotate(240deg) scale(0.9); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-15px) rotate(2deg); }
+  66% { transform: translateY(10px) rotate(-1deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.6; filter: blur(60px); }
+  50% { opacity: 0.9; filter: blur(80px); }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes scroll-bounce {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(8px); opacity: 0.5; }
+}
+
+@keyframes particle-drift {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translate(var(--drift-x, 40px), var(--drift-y, -60px)) rotate(var(--drift-r, 180deg)); opacity: 0; }
+}
+
+.animate-blob {
+  animation: blob 8s ease-in-out infinite;
+}
+
+.animate-blob-spin {
+  animation: blob-spin 20s linear infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 4s ease-in-out infinite;
+}
+
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 6s ease infinite;
+}
+
+.animate-scroll-bounce {
+  animation: scroll-bounce 2s ease-in-out infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-3000 {
+  animation-delay: 3s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+.animation-delay-5000 {
+  animation-delay: 5s;
+}
+
+.glass {
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+}
+
+/* ─── Scroll-triggered reveal animations ─────────────── */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-scale.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Hero entrance animations */
+.hero-badge {
+  opacity: 0;
+  transform: translateY(-20px) scale(0.9);
+  animation: hero-badge-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+}
+
+@keyframes hero-badge-in {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.hero-title {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: hero-title-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+}
+
+@keyframes hero-title-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-subtitle {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: hero-subtitle-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards;
+}
+
+@keyframes hero-subtitle-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-buttons {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: hero-buttons-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.9s forwards;
+}
+
+@keyframes hero-buttons-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-scroll-indicator {
+  opacity: 0;
+  animation: hero-scroll-in 0.6s ease 1.5s forwards;
+}
+
+@keyframes hero-scroll-in {
+  to { opacity: 1; }
+}
+
+/* ── Focus / Exam Mode dark viewer overrides ── */
+.focus-dark-viewer .border {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.focus-dark-viewer .bg-muted\/30,
+.focus-dark-viewer .bg-muted\/20 {
+  background-color: rgba(20, 20, 25, 0.5);
+}
+.focus-dark-viewer .bg-background {
+  background-color: rgba(15, 15, 20, 0.9);
+}
+.focus-dark-viewer .text-muted-foreground {
+  color: rgba(160, 160, 180, 0.8);
+}

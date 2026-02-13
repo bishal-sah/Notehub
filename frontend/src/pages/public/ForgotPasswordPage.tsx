@@ -1,8 +1,9 @@
 /**
- * Forgot password page.
+ * Forgot password page — sends a real password reset email via Celery.
  */
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { authService } from '@/lib/services';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,7 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/components/ui/use-toast';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { BookOpen, Loader2, ArrowLeft } from 'lucide-react';
+import { BookOpen, Loader2, ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 export default function ForgotPasswordPage() {
   const { toast } = useToast();
@@ -20,13 +21,17 @@ export default function ForgotPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email.trim()) return;
     setLoading(true);
-    // In a real app, this would call the backend password reset endpoint
-    setTimeout(() => {
+    try {
+      await authService.requestPasswordReset(email.trim());
       setSent(true);
-      setLoading(false);
       toast({ title: 'Email sent', description: 'If an account exists, you will receive a reset link.' });
-    }, 1500);
+    } catch {
+      toast({ title: 'Error', description: 'Something went wrong. Please try again.', variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -36,7 +41,7 @@ export default function ForgotPasswordPage() {
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-2">
-              <BookOpen className="h-8 w-8 text-primary" />
+              {sent ? <CheckCircle2 className="h-8 w-8 text-green-500" /> : <BookOpen className="h-8 w-8 text-primary" />}
             </div>
             <CardTitle className="text-2xl">Reset Password</CardTitle>
             <CardDescription>

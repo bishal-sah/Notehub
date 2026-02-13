@@ -1,0 +1,18 @@
+{% extends "emails/base.html" %}
+{% block title %}Note Rejected - NoteHub{% endblock %}
+{% block content %}
+<h2>Note Review Update</h2>
+<p>Hi <strong>{{ user_name }}</strong>,</p>
+<p>Your note has been reviewed and was <span class="badge badge-red">Rejected</span>.</p>
+<hr class="divider">
+<div class="note-card">
+  <h4>{{ note_title }}</h4>
+  <p>{{ note_subject }} · Uploaded {{ note_date }}</p>
+</div>
+{% if reason %}
+<p><strong>Reason:</strong> {{ reason }}</p>
+{% endif %}
+<p>You can edit and resubmit your note for review.</p>
+<a href="{{ edit_url }}" class="btn">Edit & Resubmit</a>
+<p class="muted">If you believe this was a mistake, please contact our team.</p>
+{% endblock %}
