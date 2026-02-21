@@ -1,4 +1,4 @@
-/**
+/** 
  * Study Group detail page — chat, pinned notes, and member management.
  * Acts like a mini Discord channel per subject.
  */
@@ -21,6 +21,7 @@ import {
 import {
   Users, Send, Pin, Trash2, Loader2, ArrowLeft, Copy,
   FileText, Shield, UserMinus, ChevronUp, LogOut, Hash,
+  Group,
 } from 'lucide-react';
 
 function initials(name: string) {

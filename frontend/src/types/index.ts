@@ -13,6 +13,7 @@ export interface User {
   phone: string;
   faculty: number | null;
   faculty_name: string | null;
+  is_active: boolean;
   is_verified: boolean;
   total_notes: number;
   created_at: string;
@@ -945,4 +946,40 @@ export interface ChatSendResponse {
   user_message: ChatMessageItem;
   assistant_message: ChatMessageItem;
   session_title: string;
+}
+
+/* ─── Personal Notes (Note Maker) ───────────────────── */
+
+export interface PersonalNoteListItem {
+  id: number;
+  title: string;
+  preview: string;
+  tags: string;
+  tags_list: string[];
+  is_pinned: boolean;
+  is_archived: boolean;
+  color: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PersonalNoteDetail {
+  id: number;
+  title: string;
+  content: string;
+  tags: string;
+  tags_list: string[];
+  preview: string;
+  is_pinned: boolean;
+  is_archived: boolean;
+  color: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PersonalNoteExport {
+  title: string;
+  content: string;
+  text: string;
+  html: string;
 }

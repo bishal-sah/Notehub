@@ -30,6 +30,7 @@ export default function Navbar() {
     { label: 'Resources', href: '/resources' },
     { label: 'Leaderboard', href: '/leaderboard' },
     { label: 'About', href: '/about' },
+    { label: '❤️ Donate', href: '/donate' },
   ];
 
   return (

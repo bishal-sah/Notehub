@@ -7,6 +7,7 @@ import { noteService, annotationService } from '@/lib/services';
 import type { NoteDetail, NoteAnnotation } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
+import { mediaUrl } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -86,10 +87,23 @@ export default function NoteDetailPage() {
     setDownloading(true);
     try {
       const res = await noteService.download(slug);
-      window.open(res.data.file_url, '_blank');
+      // Fetch the file as a blob and trigger download via object URL
+      const fileResponse = await fetch(mediaUrl(res.data.file_url));
+      if (!fileResponse.ok) throw new Error('File fetch failed');
+      const blob = await fileResponse.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = note?.title ? `${note.title}.${note.file_type || 'pdf'}` : 'download.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
       setNote((prev) => prev ? { ...prev, downloads_count: res.data.downloads_count } : prev);
-    } catch {
-      toast({ title: 'Error', description: 'Failed to download.', variant: 'destructive' });
+      toast({ title: 'Download started', description: 'Your download should begin shortly.' });
+    } catch (error: any) {
+      console.error('Download error:', error);
+      toast({ title: 'Error', description: 'Failed to download. Please try again.', variant: 'destructive' });
     } finally {
       setDownloading(false);
     }
@@ -301,7 +315,7 @@ export default function NoteDetailPage() {
           {viewerOpen && note.slug && (
             <div className="mt-6">
               <NoteViewer
-                fileUrl={noteService.previewUrl(note.slug)}
+                fileUrl={mediaUrl(note.file)}
                 fileType={note.file_type || 'pdf'}
                 fileName={note.title}
                 onDownload={handleDownload}
@@ -368,6 +382,7 @@ export default function NoteDetailPage() {
         <FocusMode
           noteTitle={note.title}
           noteSlug={note.slug}
+          fileUrl={mediaUrl(note.file)}
           fileType={note.file_type}
           subjectName={note.subject_name}
           onExit={() => setFocusMode(false)}

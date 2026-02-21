@@ -2,7 +2,7 @@
  * Public footer with links and branding.
  */
 import { Link } from 'react-router-dom';
-import { BookOpen, Github, Mail } from 'lucide-react';
+import { BookOpen, Facebook, Instagram, Mail, MapPin, Phone } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -23,6 +23,7 @@ export default function Footer() {
             <li><Link to="/faculties" className="hover:text-foreground transition-colors">Faculties</Link></li>
             <li><Link to="/notes" className="hover:text-foreground transition-colors">Browse Notes</Link></li>
             <li><Link to="/about" className="hover:text-foreground transition-colors">About</Link></li>
+            <li><Link to="/donate" className="hover:text-foreground transition-colors text-red-500 font-medium">❤️ Donate</Link></li>
           </ul>
         </div>
         <div>
@@ -34,10 +35,15 @@ export default function Footer() {
           </ul>
         </div>
         <div>
-          <h4 className="font-semibold mb-3 text-sm">Contact</h4>
+          <h4 className="font-semibold mb-3 text-sm">Connect With Us</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
+            <li><a href="https://www.facebook.com/share/1CB5KWwTfq/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-foreground transition-colors"><Facebook className="h-4 w-4 text-[#1877F2]" /> Facebook</a></li>
+            <li><a href="https://www.instagram.com/notehub248" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-foreground transition-colors"><Instagram className="h-4 w-4 text-[#E4405F]" /> @notehub248</a></li>
             <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> support@notehub.com</li>
-            <li className="flex items-center gap-2"><Github className="h-4 w-4" /> github.com/notehub</li>
+            <li className="flex items-center gap-2"><MapPin className="h-4 w-4 shrink-0 text-red-500" /> Biratnagar, Nepal</li>
+            <li><a href="tel:+9779819702145" className="flex items-center gap-2 hover:text-foreground transition-colors"><Phone className="h-4 w-4 shrink-0 text-green-500" /> +977 981-9702145</a></li>
+            <li><a href="tel:+9779807000750" className="flex items-center gap-2 hover:text-foreground transition-colors"><Phone className="h-4 w-4 shrink-0 text-green-500" /> +977 980-7000750</a></li>
+            <li><a href="tel:+9779762332949" className="flex items-center gap-2 hover:text-foreground transition-colors"><Phone className="h-4 w-4 shrink-0 text-green-500" /> +977 976-2332949</a></li>
           </ul>
         </div>
       </div>

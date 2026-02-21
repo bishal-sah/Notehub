@@ -23,6 +23,7 @@ import LeaderboardPage from '@/pages/public/LeaderboardPage';
 import OfflineNotesPage from '@/pages/public/OfflineNotesPage';
 import NotFoundPage from '@/pages/public/NotFoundPage';
 import ResourceHubPage from '@/pages/public/ResourceHubPage';
+import DonatePage from '@/pages/public/DonatePage';
 import StudyAssistant from '@/components/ai/StudyAssistant';
 
 // PWA components
@@ -47,6 +48,7 @@ import OcrScanner from '@/pages/dashboard/OcrScanner';
 import StudyBuddies from '@/pages/dashboard/StudyBuddies';
 import SemesterRoadmap from '@/pages/dashboard/SemesterRoadmap';
 import Reputation from '@/pages/dashboard/Reputation';
+import NoteMaker from '@/pages/dashboard/NoteMaker';
 
 // Admin pages
 import AdminDashboard from '@/pages/admin/AdminDashboard';
@@ -78,6 +80,7 @@ export default function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/offline" element={<OfflineNotesPage />} />
           <Route path="/resources" element={<ResourceHubPage />} />
+          <Route path="/donate" element={<DonatePage />} />
 
           {/* User Dashboard Routes */}
           <Route element={<ProtectedRoute />}>
@@ -99,6 +102,7 @@ export default function App() {
               <Route path="/dashboard/study-buddies" element={<StudyBuddies />} />
               <Route path="/dashboard/roadmap" element={<SemesterRoadmap />} />
               <Route path="/dashboard/reputation" element={<Reputation />} />
+              <Route path="/dashboard/note-maker" element={<NoteMaker />} />
             </Route>
           </Route>
 

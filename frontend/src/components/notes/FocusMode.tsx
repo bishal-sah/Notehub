@@ -13,7 +13,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import NoteViewer from '@/components/viewer/NoteViewer';
-import { noteService } from '@/lib/services';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -25,6 +24,7 @@ import {
 interface FocusModeProps {
   noteTitle: string;
   noteSlug: string;
+  fileUrl: string;
   fileType: string;
   subjectName?: string;
   onExit: () => void;
@@ -52,7 +52,7 @@ function formatTime(totalSeconds: number): string {
 }
 
 export default function FocusMode({
-  noteTitle, noteSlug, fileType, subjectName, onExit,
+  noteTitle, noteSlug, fileUrl, fileType, subjectName, onExit,
 }: FocusModeProps) {
   // Timer state
   const [timerMode, setTimerMode] = useState<TimerMode>('stopwatch');
@@ -399,7 +399,7 @@ export default function FocusMode({
         <div className={`h-full overflow-auto ${darkOverlay ? 'focus-dark-viewer' : ''}`}>
           <div className="max-w-5xl mx-auto py-4 px-4">
             <NoteViewer
-              fileUrl={noteService.previewUrl(noteSlug)}
+              fileUrl={fileUrl}
               fileType={fileType || 'pdf'}
               fileName={noteTitle}
             />

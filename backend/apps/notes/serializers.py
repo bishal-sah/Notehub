@@ -5,6 +5,7 @@ from rest_framework import serializers
 from apps.notes.models import (
     Note, NoteApproval, NoteReport, NoteComment, NoteAnnotation, NoteRating,
     Collection, Bookmark, FlashcardDeck, Flashcard, FlashcardReview, NoteVersion,
+    PersonalNote,
 )
 from django.db.models import Avg, Count
 
@@ -620,3 +621,38 @@ class NoteLayerCreateSerializer(serializers.ModelSerializer):
 class NoteLayerVoteSerializer(serializers.Serializer):
     """Serializer for voting on a layer."""
     vote_type = serializers.ChoiceField(choices=['up', 'down'])
+
+
+# ─── Personal Notes (Note Maker) ──────────────────────────
+
+class PersonalNoteListSerializer(serializers.ModelSerializer):
+    """Lightweight serializer for personal note list sidebar."""
+    preview = serializers.CharField(read_only=True)
+    tags_list = serializers.ListField(read_only=True)
+
+    class Meta:
+        model = PersonalNote
+        fields = [
+            'id', 'title', 'preview', 'tags', 'tags_list',
+            'is_pinned', 'is_archived', 'color',
+            'created_at', 'updated_at',
+        ]
+
+
+class PersonalNoteDetailSerializer(serializers.ModelSerializer):
+    """Full serializer for reading/writing a personal note."""
+    tags_list = serializers.ListField(read_only=True)
+    preview = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = PersonalNote
+        fields = [
+            'id', 'title', 'content', 'tags', 'tags_list', 'preview',
+            'is_pinned', 'is_archived', 'color',
+            'created_at', 'updated_at',
+        ]
+        read_only_fields = ['created_at', 'updated_at']
+
+    def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)

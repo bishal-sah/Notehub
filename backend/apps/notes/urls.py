@@ -73,6 +73,11 @@ from apps.notes.views import (
     ChatSessionDetailView,
     ChatSendMessageView,
     ChatClearAllView,
+    PersonalNoteListCreateView,
+    PersonalNoteDetailView,
+    PersonalNotePinToggleView,
+    PersonalNoteArchiveToggleView,
+    PersonalNoteExportView,
 )
 
 urlpatterns = [
@@ -86,6 +91,13 @@ urlpatterns = [
     # Semester Packs (must be above <slug:slug>/ catch-all)
     path('semester-packs/', SemesterPackListView.as_view(), name='semester-pack-list'),
     path('semester-packs/<int:semester_id>/download/', SemesterPackDownloadView.as_view(), name='semester-pack-download'),
+
+    # Personal Notes (must be above <slug:slug>/ catch-all)
+    path('personal/', PersonalNoteListCreateView.as_view(), name='personal-notes'),
+    path('personal/<int:pk>/', PersonalNoteDetailView.as_view(), name='personal-note-detail'),
+    path('personal/<int:pk>/pin/', PersonalNotePinToggleView.as_view(), name='personal-note-pin'),
+    path('personal/<int:pk>/archive/', PersonalNoteArchiveToggleView.as_view(), name='personal-note-archive'),
+    path('personal/<int:pk>/export/', PersonalNoteExportView.as_view(), name='personal-note-export'),
 
     path('<slug:slug>/', PublicNoteDetailView.as_view(), name='note-detail'),
     path('<slug:slug>/download/', NoteDownloadView.as_view(), name='note-download'),
@@ -182,4 +194,5 @@ urlpatterns = [
     path('chat/sessions/<int:pk>/', ChatSessionDetailView.as_view(), name='chat-session-detail'),
     path('chat/sessions/<int:pk>/send/', ChatSendMessageView.as_view(), name='chat-send'),
     path('chat/clear/', ChatClearAllView.as_view(), name='chat-clear-all'),
+
 ]

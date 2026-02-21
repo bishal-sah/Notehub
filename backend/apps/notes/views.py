@@ -20,6 +20,7 @@ from apps.notes.models import (
     Collection, Bookmark, FlashcardDeck, Flashcard, FlashcardReview, NoteVersion,
     NoteLayer, NoteLayerVote, TopperVerification,
     ChatSession, ChatMessage,
+    PersonalNote,
 )
 from apps.notes.serializers import (
     NoteListSerializer,
@@ -56,6 +57,8 @@ from apps.notes.serializers import (
     NoteLayerSerializer,
     NoteLayerCreateSerializer,
     NoteLayerVoteSerializer,
+    PersonalNoteListSerializer,
+    PersonalNoteDetailSerializer,
 )
 from apps.notes.flashcard_generator import generate_flashcards
 from apps.notes.ocr_service import ocr_from_file
@@ -2149,3 +2152,109 @@ class ChatClearAllView(APIView):
     def delete(self, request):
         ChatSession.objects.filter(user=request.user).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# ─── Personal Notes (Note Maker) ──────────────────────────────
+
+class PersonalNoteListCreateView(APIView):
+    """List all personal notes or create a new one."""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        qs = PersonalNote.objects.filter(user=request.user, is_archived=False)
+        serializer = PersonalNoteListSerializer(qs, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = PersonalNoteDetailSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class PersonalNoteDetailView(APIView):
+    """Retrieve, update, or delete a personal note."""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def _get_note(self, pk, user):
+        try:
+            return PersonalNote.objects.get(pk=pk, user=user)
+        except PersonalNote.DoesNotExist:
+            return None
+
+    def get(self, request, pk):
+        note = self._get_note(pk, request.user)
+        if not note:
+            return Response({'error': 'Note not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = PersonalNoteDetailSerializer(note)
+        return Response(serializer.data)
+
+    def patch(self, request, pk):
+        note = self._get_note(pk, request.user)
+        if not note:
+            return Response({'error': 'Note not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = PersonalNoteDetailSerializer(note, data=request.data, partial=True, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, pk):
+        note = self._get_note(pk, request.user)
+        if not note:
+            return Response({'error': 'Note not found.'}, status=status.HTTP_404_NOT_FOUND)
+        note.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class PersonalNotePinToggleView(APIView):
+    """Toggle pin status on a personal note."""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            note = PersonalNote.objects.get(pk=pk, user=request.user)
+        except PersonalNote.DoesNotExist:
+            return Response({'error': 'Note not found.'}, status=status.HTTP_404_NOT_FOUND)
+        note.is_pinned = not note.is_pinned
+        note.save(update_fields=['is_pinned'])
+        return Response({'is_pinned': note.is_pinned})
+
+
+class PersonalNoteArchiveToggleView(APIView):
+    """Toggle archive status on a personal note."""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            note = PersonalNote.objects.get(pk=pk, user=request.user)
+        except PersonalNote.DoesNotExist:
+            return Response({'error': 'Note not found.'}, status=status.HTTP_404_NOT_FOUND)
+        note.is_archived = not note.is_archived
+        note.save(update_fields=['is_archived'])
+        return Response({'is_archived': note.is_archived})
+
+
+class PersonalNoteExportView(APIView):
+    """Export a personal note as plain text for download."""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        try:
+            note = PersonalNote.objects.get(pk=pk, user=request.user)
+        except PersonalNote.DoesNotExist:
+            return Response({'error': 'Note not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Strip HTML tags for clean text export
+        plain_content = re.sub(r'<[^>]+>', '', note.content)
+        text = f"{note.title}\n{'=' * len(note.title)}\n\n{plain_content}\n"
+        if note.tags:
+            text += f"\nTags: {note.tags}\n"
+        text += f"\nCreated: {note.created_at.strftime('%Y-%m-%d %H:%M')}"
+        text += f"\nLast updated: {note.updated_at.strftime('%Y-%m-%d %H:%M')}"
+
+        return Response({
+            'title': note.title,
+            'content': plain_content,
+            'text': text,
+            'html': note.content,
+        })

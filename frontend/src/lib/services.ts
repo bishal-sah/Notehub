@@ -55,6 +55,9 @@ import type {
   ChatSessionItem,
   ChatSessionDetail,
   ChatSendResponse,
+  PersonalNoteListItem,
+  PersonalNoteDetail,
+  PersonalNoteExport,
 } from '@/types';
 
 /* ─── Auth ────────────────────────────────────────────── */
@@ -221,6 +224,9 @@ export const adminUserService = {
 
   verify: (id: number) =>
     api.post(`/auth/admin/users/${id}/verify/`),
+
+  changeRole: (id: number, role: 'admin' | 'user') =>
+    api.patch(`/auth/admin/users/${id}/`, { role }),
 };
 
 /* ─── Admin Academics ─────────────────────────────────── */
@@ -695,4 +701,32 @@ export const chatService = {
 
   clearAll: () =>
     api.delete('/notes/chat/clear/'),
+};
+
+/* ─── Personal Notes (Note Maker) ────────────────────── */
+
+export const personalNoteService = {
+  list: () =>
+    api.get<PersonalNoteListItem[]>('/notes/personal/'),
+
+  detail: (id: number) =>
+    api.get<PersonalNoteDetail>(`/notes/personal/${id}/`),
+
+  create: (data: Partial<PersonalNoteDetail>) =>
+    api.post<PersonalNoteDetail>('/notes/personal/', data),
+
+  update: (id: number, data: Partial<PersonalNoteDetail>) =>
+    api.patch<PersonalNoteDetail>(`/notes/personal/${id}/`, data),
+
+  delete: (id: number) =>
+    api.delete(`/notes/personal/${id}/`),
+
+  togglePin: (id: number) =>
+    api.post<{ is_pinned: boolean }>(`/notes/personal/${id}/pin/`),
+
+  toggleArchive: (id: number) =>
+    api.post<{ is_archived: boolean }>(`/notes/personal/${id}/archive/`),
+
+  export: (id: number) =>
+    api.get<PersonalNoteExport>(`/notes/personal/${id}/export/`),
 };

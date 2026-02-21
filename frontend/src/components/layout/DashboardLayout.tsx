@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import {
   BookOpen, LayoutDashboard, Upload, FileText, User, Bell, Lock,
   Shield, CheckSquare, Users, GraduationCap, Copy, FileWarning, Settings,
-  Menu, X, LogOut, ChevronLeft, Trophy, Bookmark, MessageSquare, Brain, ScanLine, UserPlus, Map, Award,
+  Menu, X, LogOut, ChevronLeft, Trophy, Bookmark, MessageSquare, Brain, ScanLine, UserPlus, Map, Award, StickyNote,
 } from 'lucide-react';
 import ThemeToggle from '@/components/layout/ThemeToggle';
 
@@ -43,11 +43,12 @@ export default function DashboardLayout() {
     { label: 'OCR Scanner', href: '/dashboard/ocr', icon: <ScanLine className="h-4 w-4" /> },
     { label: 'Leaderboard', href: '/leaderboard', icon: <Trophy className="h-4 w-4" /> },
     { label: 'Reputation', href: '/dashboard/reputation', icon: <Award className="h-4 w-4" /> },
+    { label: 'Note Maker', href: '/dashboard/note-maker', icon: <StickyNote className="h-4 w-4" /> },
   ];
 
   const adminLinks: SidebarLink[] = [
     { label: 'Admin Dashboard', href: '/admin', icon: <Shield className="h-4 w-4" /> },
-    { label: 'Pending Approvals', href: '/admin/pending', icon: <CheckSquare className="h-4 w-4" /> },
+    { label: 'Pending Approvals', href: '/admin/approvals', icon: <CheckSquare className="h-4 w-4" /> },
     { label: 'All Notes', href: '/admin/notes', icon: <FileText className="h-4 w-4" /> },
     { label: 'User Management', href: '/admin/users', icon: <Users className="h-4 w-4" /> },
     { label: 'Faculty Management', href: '/admin/faculties', icon: <GraduationCap className="h-4 w-4" /> },

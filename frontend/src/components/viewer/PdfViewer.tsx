@@ -2,10 +2,10 @@
  * In-browser PDF viewer — continuous scroll with all pages rendered.
  * Supports zoom, rotation, fullscreen, page navigation (scroll-to), and keyboard shortcuts.
  */
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
-import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
-import 'react-pdf/dist/esm/Page/TextLayer.css';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -23,8 +23,11 @@ import {
 import { cn } from '@/lib/utils';
 import type { NoteAnnotation } from '@/types';
 
-// Configure pdf.js worker via CDN (pdfjs-dist v3.x uses .js, not .mjs)
-pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+// Configure pdf.js worker for react-pdf v10 (pdfjs-dist v5.x uses .mjs)
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url,
+).toString();
 
 interface PdfViewerProps {
   fileUrl: string;
@@ -68,11 +71,38 @@ export default function PdfViewer({
   const [error, setError] = useState(false);
   const [pageInputValue, setPageInputValue] = useState('1');
   const [containerWidth, setContainerWidth] = useState<number>(0);
+  const [pdfData, setPdfData] = useState<Uint8Array | null>(null);
+
+  // Memoize the file prop so react-pdf Document doesn't remount on every render
+  const pdfFile = useMemo(() => pdfData ? { data: new Uint8Array(pdfData) } : null, [pdfData]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<HTMLDivElement>(null);
   const pageRefs = useRef<Map<number, HTMLDivElement>>(new Map());
   const isScrollingToPage = useRef(false);
+
+  // Pre-fetch PDF as binary data to bypass proxy/CORS issues
+  useEffect(() => {
+    if (!fileUrl) return;
+    setLoading(true);
+    setError(false);
+    setPdfData(null);
+
+    fetch(fileUrl)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.arrayBuffer();
+      })
+      .then((buf) => {
+        // Store as Uint8Array so the underlying buffer isn't detached on re-render
+        setPdfData(new Uint8Array(buf));
+      })
+      .catch((err) => {
+        console.error('PDF fetch error:', err, 'URL:', fileUrl);
+        setError(true);
+        setLoading(false);
+      });
+  }, [fileUrl]);
 
   // Measure container width for responsive scaling
   useEffect(() => {
@@ -94,10 +124,10 @@ export default function PdfViewer({
     setError(false);
   }, []);
 
-  const onDocumentLoadError = useCallback((err: Error) => {
-    console.error('[PdfViewer] Failed to load PDF:', err?.message || err);
-    setLoading(false);
+  const onDocumentLoadError = useCallback((err: any) => {
+    console.error('PDF parse error:', err);
     setError(true);
+    setLoading(false);
   }, []);
 
   // Track current page based on scroll position
@@ -326,16 +356,23 @@ export default function PdfViewer({
               )}
             </div>
           </div>
+        ) : !pdfData ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="flex flex-col items-center gap-3">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="text-sm text-muted-foreground">Downloading PDF...</p>
+            </div>
+          </div>
         ) : (
           <Document
-            file={fileUrl}
+            file={pdfFile}
             onLoadSuccess={onDocumentLoadSuccess}
             onLoadError={onDocumentLoadError}
             loading={
               <div className="flex items-center justify-center py-20">
                 <div className="flex flex-col items-center gap-3">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  <p className="text-sm text-muted-foreground">Loading document...</p>
+                  <p className="text-sm text-muted-foreground">Rendering pages...</p>
                 </div>
               </div>
             }

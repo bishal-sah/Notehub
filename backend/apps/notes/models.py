@@ -709,3 +709,37 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return f"[{self.role}] {self.content[:60]}"
+
+
+class PersonalNote(models.Model):
+    """A personal note created by a user in the built-in note maker."""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='personal_notes',
+    )
+    title = models.CharField(max_length=300, default='Untitled')
+    content = models.TextField(blank=True, default='')
+    tags = models.CharField(max_length=500, blank=True, help_text='Comma-separated tags')
+    is_pinned = models.BooleanField(default=False)
+    is_archived = models.BooleanField(default=False)
+    color = models.CharField(max_length=20, blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-is_pinned', '-updated_at']
+
+    def __str__(self):
+        return f"{self.title} — {self.user.username}"
+
+    @property
+    def tags_list(self):
+        return [t.strip() for t in self.tags.split(',') if t.strip()] if self.tags else []
+
+    @property
+    def preview(self):
+        """First 150 chars of plain text content for sidebar preview."""
+        import re
+        plain = re.sub(r'<[^>]+>', '', self.content)
+        return plain[:150] if plain else ''
