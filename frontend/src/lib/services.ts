@@ -76,7 +76,7 @@ export const authService = {
     api.post('/auth/token/refresh/', { refresh }),
 
   requestPasswordReset: (email: string) =>
-    api.post<{ message: string }>('/auth/password-reset/', { email }),
+    api.post<{ message: string; token?: string }>('/auth/password-reset/', { email }),
 
   confirmPasswordReset: (token: string, new_password: string) =>
     api.post<{ message: string }>('/auth/password-reset/confirm/', { token, new_password }),

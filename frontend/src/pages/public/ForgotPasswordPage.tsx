@@ -2,7 +2,7 @@
  * Forgot password page — sends a real password reset email via Celery.
  */
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '@/lib/services';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +15,7 @@ import { BookOpen, Loader2, ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 export default function ForgotPasswordPage() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
@@ -24,11 +25,16 @@ export default function ForgotPasswordPage() {
     if (!email.trim()) return;
     setLoading(true);
     try {
-      await authService.requestPasswordReset(email.trim());
-      setSent(true);
-      toast({ title: 'Email sent', description: 'If an account exists, you will receive a reset link.' });
+      const res = await authService.requestPasswordReset(email.trim());
+      if (res.data.token) {
+        toast({ title: 'Account verified', description: 'You can now set a new password.' });
+        navigate(`/reset-password?token=${res.data.token}`);
+      } else {
+        setSent(true);
+        toast({ title: 'Error', description: 'No account found with that email.', variant: 'destructive' });
+      }
     } catch {
-      toast({ title: 'Error', description: 'Something went wrong. Please try again.', variant: 'destructive' });
+      toast({ title: 'Error', description: 'No account found with that email. Please try again.', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -46,8 +52,8 @@ export default function ForgotPasswordPage() {
             <CardTitle className="text-2xl">Reset Password</CardTitle>
             <CardDescription>
               {sent
-                ? 'Check your email for a password reset link.'
-                : 'Enter your email address and we\'ll send you a reset link.'}
+                ? 'No account was found with that email address.'
+                : 'Enter your email address to verify your account and reset your password.'}
             </CardDescription>
           </CardHeader>
           {!sent ? (
@@ -61,7 +67,7 @@ export default function ForgotPasswordPage() {
               <CardFooter className="flex flex-col gap-3">
                 <Button className="w-full" type="submit" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Send Reset Link
+                  Verify & Reset Password
                 </Button>
                 <Link to="/login" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 justify-center">
                   <ArrowLeft className="h-3 w-3" /> Back to Login

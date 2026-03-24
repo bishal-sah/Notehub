@@ -264,11 +264,7 @@ class PasswordResetRequestView(APIView):
             expires_at=timezone.now() + td(hours=24),
         )
 
-        # Send email asynchronously via Celery
-        from apps.notes.tasks import send_password_reset_email
-        send_password_reset_email.delay(user_id=user.id, token=token, expiry_hours=24)
-
-        return Response({'message': 'If an account exists with that email, a reset link has been sent.'})
+        return Response({'message': 'Password reset token generated.', 'token': token})
 
 
 class PasswordResetConfirmView(APIView):

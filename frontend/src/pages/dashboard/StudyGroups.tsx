@@ -46,11 +46,14 @@ export default function StudyGroups() {
 
   useEffect(() => { loadGroups(); }, []);
 
+  const COLORS = ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ef4444', '#14b8a6'];
+
   const handleCreate = async () => {
     if (!newName.trim()) return;
     setCreating(true);
     try {
-      await groupService.create({ name: newName, description: newDesc });
+      const randomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+      await groupService.create({ name: newName, description: newDesc, avatar_color: randomColor });
       toast({ title: 'Group created!' });
       setCreateOpen(false);
       setNewName('');
@@ -78,8 +81,6 @@ export default function StudyGroups() {
       setJoining(false);
     }
   };
-
-  const COLORS = ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ef4444', '#14b8a6'];
 
   if (loading) {
     return (

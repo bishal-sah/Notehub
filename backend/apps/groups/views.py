@@ -48,6 +48,15 @@ class CreateGroupView(generics.CreateAPIView):
     serializer_class = StudyGroupCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        group = serializer.save()
+        return Response(
+            StudyGroupListSerializer(group).data,
+            status=status.HTTP_201_CREATED,
+        )
+
 
 class GroupDetailView(APIView):
     """Retrieve, update, or delete a study group."""

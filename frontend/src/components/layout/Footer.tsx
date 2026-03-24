@@ -2,7 +2,7 @@
  * Public footer with links and branding.
  */
 import { Link } from 'react-router-dom';
-import { BookOpen, Facebook, Instagram, Mail, MapPin, Phone } from 'lucide-react';
+import { BookOpen, Facebook, Github, Instagram, Mail, MapPin, Phone } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -39,6 +39,7 @@ export default function Footer() {
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li><a href="https://www.facebook.com/share/1CB5KWwTfq/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-foreground transition-colors"><Facebook className="h-4 w-4 text-[#1877F2]" /> Facebook</a></li>
             <li><a href="https://www.instagram.com/notehub248" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-foreground transition-colors"><Instagram className="h-4 w-4 text-[#E4405F]" /> @notehub248</a></li>
+            <li><a href="https://github.com/bishal-sah/Notehub" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-foreground transition-colors"><Github className="h-4 w-4" /> GitHub</a></li>
             <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> support@notehub.com</li>
             <li className="flex items-center gap-2"><MapPin className="h-4 w-4 shrink-0 text-red-500" /> Biratnagar, Nepal</li>
             <li><a href="tel:+9779819702145" className="flex items-center gap-2 hover:text-foreground transition-colors"><Phone className="h-4 w-4 shrink-0 text-green-500" /> +977 981-9702145</a></li>

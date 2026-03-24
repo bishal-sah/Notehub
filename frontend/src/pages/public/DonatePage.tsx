@@ -27,6 +27,7 @@ import {
   QrCode,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { QRCodeSVG } from 'qrcode.react';
 
 /* ── Payment Info ─────────────────────────────────── */
 const PAYMENT_METHODS = [
@@ -56,8 +57,8 @@ const PAYMENT_METHODS = [
     id: 'khalti',
     name: 'Khalti',
     tagline: 'Digital Wallet for Nepal',
-    phone: '9819702145',
-    holder: 'Bishal Kumar Sah',
+    phone: '9807000750',
+    holder: 'Hansel Mandal',
     qrImage: '/payments/khalti-qr.png',
     color: 'from-purple-500 to-indigo-600',
     bgColor: 'bg-purple-50 dark:bg-purple-950/30',
@@ -203,26 +204,16 @@ export default function DonatePage() {
                 <CardContent className="p-6 flex flex-col items-center">
                   {/* QR Code */}
                   <div className="bg-white p-4 rounded-2xl shadow-inner border mb-6">
-                    <img
-                      src={activeMethod.qrImage}
-                      alt={`${activeMethod.name} QR Code`}
-                      className="w-56 h-56 object-contain"
-                      onError={(e) => {
-                        // Fallback if image not found
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        target.parentElement!.innerHTML = `
-                          <div class="w-56 h-56 flex flex-col items-center justify-center text-center text-muted-foreground gap-2">
-                            <svg class="h-12 w-12 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
-                            </svg>
-                            <p class="text-sm font-medium">QR Code</p>
-                            <p class="text-xs">Scan with ${activeMethod.name} app</p>
-                          </div>
-                        `;
-                      }}
+                    <QRCodeSVG
+                      value={activeMethod.phone}
+                      size={224}
+                      level="H"
+                      includeMargin={false}
+                      bgColor="#ffffff"
+                      fgColor="#000000"
                     />
                   </div>
+                  <p className="text-xs text-muted-foreground mb-4">Scan with {activeMethod.name} app to pay</p>
 
                   {/* Account Info */}
                   <div className="w-full space-y-3">
